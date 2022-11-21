@@ -18,5 +18,8 @@
   "homepage": "https://github.com/TehilaFavourite/Favour-and-Aimua#readme",
   "devDependencies": {
     "hardhat": "^2.12.2"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^4.8.0"
   }
 }

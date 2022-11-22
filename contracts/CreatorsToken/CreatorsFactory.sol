@@ -13,8 +13,7 @@ contract Factory {
         string calldata _symbol,
         uint256 _totalSupply
     ) public returns (address) {
-        CreatorsToken token = new CreatorsToken(_name, _symbol, _totalSupply);
-        token.transfer(msg.sender, _totalSupply);
+        CreatorsToken token = new CreatorsToken(_name, _symbol, _totalSupply, msg.sender);
         tokens.push(address(token));
         tokenCount += 1;
         emit TokenDeployed(address(token));

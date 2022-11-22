@@ -9,9 +9,11 @@ contract CreatorsToken is ERC20, ERC20Burnable, Ownable {
     constructor(
         string memory _name,
         string memory _symbol,
-        uint256 _supply
-    ) ERC20(_name, _symbol) {
-        _mint(msg.sender, _supply);
+        uint256 _supply,
+        address owner_
+    ) ERC20(_name, _symbol) {        
+        transferOwnership(owner_);
+        _mint(owner_, _supply);
     }
 
     function mint(address to, uint256 amount) public onlyOwner {

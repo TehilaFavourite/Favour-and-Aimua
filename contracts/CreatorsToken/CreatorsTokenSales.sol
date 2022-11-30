@@ -5,6 +5,7 @@ import "../LiquidityPool/Exchange.sol";
 import "./CreatorsToken.sol";
 
 contract CreatorsTokenSale {
+    // mapping that holds the information for the creators token sales
     mapping(address => Sale) creatorsTokenSales;
 
     struct Sale {
@@ -28,6 +29,7 @@ contract CreatorsTokenSale {
         uint amountClaimed;
     }
 
+    // mapping that holds all information on the exchange addresses created
     mapping(address => address) createdExchangeAddresses;
 
     address contractDeployer;
@@ -43,18 +45,29 @@ contract CreatorsTokenSale {
         address indexed creatorsAddress,
         uint indexed buyAmount
     );
+    event NewExchange(
+        address indexed token,
+        address indexed creator,
+        address indexed exchange
+    );
 
     constructor() {
         contractDeployer = msg.sender;
     }
 
+    // a new exchange token is created for the token by the creator
     function CreateExchange(address _tokenAddress, address _creatorsAddress)
         public
     {
         Exchange newExchange = new Exchange(_tokenAddress, _creatorsAddress);
         createdExchangeAddresses[msg.sender] = address(newExchange);
+
+        emit NewExchange(_tokenAddress, _creatorsAddress, address(newExchange));
     }
 
+    // only te deployer of this contract can create sales.
+    // once you create sales for a token with the creators address and token address, you cannot create sles again
+    
     function CreateSale(
         address _creatorsAddress,
         address _creatorsTokenAddress,
@@ -77,6 +90,7 @@ contract CreatorsTokenSale {
                 0x0000000000000000000000000000000000000000,
             "creators token sale is already created"
         );
+        // percentage for liquidity must be <= 100
         require(
             _percentageForLiquidity <= 100,
             "Percentage for liquidity cannot be higher than 100"
@@ -85,7 +99,7 @@ contract CreatorsTokenSale {
             _percentageForCreators <= 100,
             "Percentage for creators cannot be higher than 100"
         );
-
+        // instatiating the functions inside the creators token contract
         CreatorsToken creatorsToken = CreatorsToken(_creatorsTokenAddress);
 
         setupSale1(
@@ -127,6 +141,9 @@ contract CreatorsTokenSale {
         address(this).delegatecall(abi.encodeWithSignature("StartSale()"));
     }
 
+    // it initializes the creators token address and store all the inputs into the mapping
+    // it mints from the creators token to the creators address
+    
     function setupSale1(
         address _creatorsAddress,
         address _creatorsTokenAddress,
@@ -136,7 +153,6 @@ contract CreatorsTokenSale {
         uint _amountMinted
     ) internal {
         CreatorsToken creatorsToken = CreatorsToken(_creatorsTokenAddress);
-        // creatorsToken.mint();
 
         creatorsTokenSales[_creatorsAddress]
             .CreatorsTokenAddress = _creatorsTokenAddress;
@@ -146,7 +162,7 @@ contract CreatorsTokenSale {
 
         creatorsTokenSales[_creatorsAddress]
             .PercentageForLiquidity = _percentageForLiquidity;
-        creatorsToken.mint(_creatorsTokenAddress, _amountMinted);
+        creatorsToken.mint(_creatorsAddress, _amountMinted);
     }
 
     function setupSale2(
